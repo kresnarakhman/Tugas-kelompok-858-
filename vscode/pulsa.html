@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USSD Menu</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            border: 2px solid #000;
+            padding: 20px;
+            background-color: #fff;
+            width: 300px;
+            text-align: center;
+        }
+        input[type="text"], input[type="number"] {
+            width: 90%;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        select {
+            width: 100%;
+            padding: 5px;
+            margin: 10px 0;
+        }
+        button {
+            margin: 5px;
+            padding: 8px 12px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <p>Mau isi pulsa gampang dan murah</p>
+        <p>Hub *858#</p>
+        <select id="menuOptions">
+            <option value="0">Pilih menu</option>
+            <option value="1">1. Transfer Pulsa</option>
+            <option value="2">2. Minta Pulsa</option>
+            <option value="3">3. Auto nomer telepon</option>
+            <option value="4">4. Delete otomatis telepon</option>
+            <option value="5">5. List Telepon</option>
+            <option value="6">6. Cek Kupon Undian TP</option>
+        </select>
+
+        <!-- Form Transfer Pulsa -->
+        <div id="transferForm" class="hidden">
+            <p>Masukkan nomor tujuan</p>
+            <input type="text" id="phoneNumber" placeholder="08xxxx atau 628xxx" />
+            <p>Masukkan nominal transfer</p>
+            <input type="number" id="amount" placeholder="Nominal transfer" />
+            <div>
+                <button onclick="cancelTransfer()">Cancel</button>
+                <button onclick="submitTransfer()">Send</button>
+            </div>
+        </div>
+
+        <!-- Form Minta Pulsa -->
+        <div id="mintaPulsaForm" class="hidden">
+            <p>Masukkan nomor pengirim pulsa</p>
+            <input type="text" id="requestPhoneNumber" placeholder="08xxxx atau 628xxx" />
+            <p>Masukkan nominal pulsa yang diminta</p>
+            <input type="number" id="requestAmount" placeholder="Nominal yang diminta" />
+            <div>
+                <button onclick="cancelMintaPulsa()">Cancel</button>
+                <button onclick="submitMintaPulsa()">Request</button>
+            </div>
+        </div>
+
+        <!-- Confirmation Message -->
+        <div id="confirmationMessage" class="hidden">
+            <p id="successMessage"></p>
+            <button onclick="resetForm()">OK</button>
+        </div>
+
+        <!-- Auto TP, Delete Auto TP, List Auto TP, and Cek Kupon Undian Messages -->
+        <div id="infoMessage" class="hidden">
+            <p id="messageContent"></p>
+            <button onclick="resetForm()">OK</button>
+        </div>
+
+        <div id="defaultButtons">
+            <button onclick="cancelOption()">Cancel</button>
+            <button onclick="sendOption()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function cancelOption() {
+            alert("Operasi dibatalkan.");
+            resetForm(); // Reset semua input dan form
+        }
+
+        function sendOption() {
+            const selectedOption = document.getElementById("menuOptions").value;
+
+            if (selectedOption === "1") {
+                // Jika user memilih Transfer Pulsa, tampilkan form transfer
+                document.getElementById("transferForm").classList.remove("hidden");
+                document.getElementById("menuOptions").disabled = true;
+                document.getElementById("defaultButtons").classList.add("hidden");
+            } else if (selectedOption === "2") {
+                // Jika user memilih Minta Pulsa, tampilkan form minta pulsa
+                document.getElementById("mintaPulsaForm").classList.remove("hidden");
+                document.getElementById("menuOptions").disabled = true;
+                document.getElementById("defaultButtons").classList.add("hidden");
+            } else if (selectedOption === "3") {
+                // Jika user memilih Auto TP
+                showInfoMessage("Auto TP berhasil diaktifkan.");
+            } else if (selectedOption === "4") {
+                // Jika user memilih Delete Auto TP
+                showInfoMessage("Auto TP berhasil dihapus.");
+            } else if (selectedOption === "5") {
+                // Jika user memilih List Auto TP
+                showInfoMessage("List Auto TP:\n1. Nomor 082346754323\n2. Nomor +62876222197.");
+            } else if (selectedOption === "6") {
+                // Jika user memilih Cek Kupon Undian TP
+                showInfoMessage("Kupon Undian TP: Kupon aktif sebanyak 3.");
+            } else {
+                alert("Fitur belum tersedia untuk pilihan ini.");
+            }
+        }
+
+        function cancelTransfer() {
+            resetForm(); // Kembalikan tampilan menu awal
+        }
+
+        function cancelMintaPulsa() {
+            resetForm(); // Kembalikan tampilan menu awal
+        }
+
+        function submitTransfer() {
+            const phoneNumber = document.getElementById("phoneNumber").value;
+            const amount = document.getElementById("amount").value;
+
+            if (phoneNumber && amount) {
+                document.getElementById("successMessage").innerText =
+                    `Transfer berhasil sebesar Rp ${amount} ke nomor ${phoneNumber}.`;
+                document.getElementById("transferForm").classList.add("hidden");
+                document.getElementById("confirmationMessage").classList.remove("hidden");
+            } else {
+                alert("masukkan nomor dan nominal transfer.");
+            }
+        }
+
+        function submitMintaPulsa() {
+            const requestPhoneNumber = document.getElementById("requestPhoneNumber").value;
+            const requestAmount = document.getElementById("requestAmount").value;
+
+            if (requestPhoneNumber && requestAmount) {
+                document.getElementById("successMessage").innerText =
+                    `Permintaan pulsa sebesar Rp ${requestAmount} dari nomor ${requestPhoneNumber} telah berhasil dikirim.`;
+                document.getElementById("mintaPulsaForm").classList.add("hidden");
+                document.getElementById("confirmationMessage").classList.remove("hidden");
+            } else {
+                alert("masukkan nomor dan nominal yang diminta.");
+            }
+        }
+
+        function showInfoMessage(message) {
+            document.getElementById("messageContent").innerText = message;
+            document.getElementById("infoMessage").classList.remove("hidden");
+            document.getElementById("menuOptions").disabled = true;
+            document.getElementById("defaultButtons").classList.add("hidden");
+        }
+
+        function resetForm() {
+            // Reset form ke kondisi awal
+            document.getElementById("phoneNumber").value = "";
+            document.getElementById("amount").value = "";
+            document.getElementById("requestPhoneNumber").value = "";
+            document.getElementById("requestAmount").value = "";
+            document.getElementById("confirmationMessage").classList.add("hidden");
+            document.getElementById("transferForm").classList.add("hidden");
+            document.getElementById("mintaPulsaForm").classList.add("hidden");
+            document.getElementById("infoMessage").classList.add("hidden");
+            document.getElementById("menuOptions").value = "0";
+            document.getElementById("menuOptions").disabled = false;
+            document.getElementById("defaultButtons").classList.remove("hidden");
+        }
+    </script>
+
+</body>
+</html>
